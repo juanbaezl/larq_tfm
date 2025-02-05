@@ -143,7 +143,12 @@ class CaseOptimizer(Optimizer):
             weights.extend(optimizer.weights)
         return weights
 
-    @Optimizer.iterations.setter
+    @property
+    def iterations(self):
+        # Se puede devolver el valor original, o personalizar el getter según sea necesario.
+        return super().iterations
+    
+    @iterations.setter
     def iterations(self, variable):
         raise NotImplementedError("CaseOptimzer does not support setting iterations.")
 
