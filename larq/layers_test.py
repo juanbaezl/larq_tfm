@@ -40,18 +40,18 @@ PARAMS_ALL_LAYERS = [
         (2, 3, 7, 6, 5),
         dict(filters=2, kernel_size=3),
     ),
-    (
-        lq.layers.QuantLocallyConnected1D,
-        tf.keras.layers.LocallyConnected1D,
-        (2, 8, 5),
-        dict(filters=4, kernel_size=3),
-    ),
-    (
-        lq.layers.QuantLocallyConnected2D,
-        tf.keras.layers.LocallyConnected2D,
-        (8, 6, 10, 4),
-        dict(filters=3, kernel_size=3),
-    ),
+    # (
+    #     lq.layers.QuantLocallyConnected1D,
+    #     tf.keras.layers.LocallyConnected1D,
+    #     (2, 8, 5),
+    #     dict(filters=4, kernel_size=3),
+    # ),
+    # (
+    #     lq.layers.QuantLocallyConnected2D,
+    #     tf.keras.layers.LocallyConnected2D,
+    #     (8, 6, 10, 4),
+    #     dict(filters=3, kernel_size=3),
+    # ),
 ]
 
 PARAMS_SEP_LAYERS = [
@@ -301,8 +301,8 @@ class TestLayerWarns:
         (lq.layers.QuantConv3D, tf.keras.layers.Conv3D),
         (lq.layers.QuantConv2DTranspose, tf.keras.layers.Conv2DTranspose),
         (lq.layers.QuantConv3DTranspose, tf.keras.layers.Conv3DTranspose),
-        (lq.layers.QuantLocallyConnected1D, tf.keras.layers.LocallyConnected1D),
-        (lq.layers.QuantLocallyConnected2D, tf.keras.layers.LocallyConnected2D),
+        #(lq.layers.QuantLocallyConnected1D, tf.keras.layers.LocallyConnected1D),
+        #(lq.layers.QuantLocallyConnected2D, tf.keras.layers.LocallyConnected2D),
         (lq.layers.QuantDepthwiseConv2D, tf.keras.layers.DepthwiseConv2D),
     ],
 )

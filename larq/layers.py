@@ -1116,264 +1116,264 @@ class QuantConv3DTranspose(QuantizerBase, tf.keras.layers.Conv3DTranspose):
         )
 
 
-@utils.register_keras_custom_object
-class QuantLocallyConnected1D(QuantizerBase, tf.keras.layers.LocallyConnected1D):
-    """Locally-connected quantized layer for 1D inputs.
+# @utils.register_keras_custom_object
+# class QuantLocallyConnected1D(QuantizerBase, tf.keras.layers.LocallyConnected1D):
+#     """Locally-connected quantized layer for 1D inputs.
 
-    The `QuantLocallyConnected1D` layer works similarly to the `QuantConv1D` layer,
-    except that weights are unshared, that is, a different set of filters is applied
-    at each different patch of the input. `input_quantizer` and `kernel_quantizer`
-    are the element-wise quantization functions to use. If both quantization functions
-    are `None` this layer is equivalent to `LocallyConnected1D`.
+#     The `QuantLocallyConnected1D` layer works similarly to the `QuantConv1D` layer,
+#     except that weights are unshared, that is, a different set of filters is applied
+#     at each different patch of the input. `input_quantizer` and `kernel_quantizer`
+#     are the element-wise quantization functions to use. If both quantization functions
+#     are `None` this layer is equivalent to `LocallyConnected1D`.
 
-    !!! example
-        ```python
-        # apply a unshared weight convolution 1d of length 3 to a sequence with
-        # 10 timesteps, with 64 output filters
-        model = Sequential()
-        model.add(QuantLocallyConnected1D(64, 3, input_shape=(10, 32)))
-        # now model.output_shape == (None, 8, 64)
-        # add a new conv1d on top
-        model.add(QuantLocallyConnected1D(32, 3))
-        # now model.output_shape == (None, 6, 32)
-        ```
+#     !!! example
+#         ```python
+#         # apply a unshared weight convolution 1d of length 3 to a sequence with
+#         # 10 timesteps, with 64 output filters
+#         model = Sequential()
+#         model.add(QuantLocallyConnected1D(64, 3, input_shape=(10, 32)))
+#         # now model.output_shape == (None, 8, 64)
+#         # add a new conv1d on top
+#         model.add(QuantLocallyConnected1D(32, 3))
+#         # now model.output_shape == (None, 6, 32)
+#         ```
 
-    # Arguments
-        filters: Integer, the dimensionality of the output space
-            (i.e. the number of output filters in the convolution).
-        kernel_size: An integer or tuple/list of a single integer,
-            specifying the length of the 1D convolution window.
-        strides: An integer or tuple/list of a single integer, specifying the stride
-            length of the convolution. Specifying any stride value != 1 is incompatible
-            with specifying any `dilation_rate` value != 1.
-        padding: Currently only supports `"valid"` (case-insensitive).
-            `"same"` may be supported in the future.
-        data_format: A string, one of `channels_last` (default) or `channels_first`.
-            The ordering of the dimensions in the inputs. `channels_last` corresponds
-            to inputs with shape `(batch, length, channels)` while `channels_first`
-            corresponds to inputs with shape `(batch, channels, length)`. It defaults
-            to the `image_data_format` value found in your Keras config file at
-            `~/.keras/keras.json`. If you never set it, then it will be "channels_last".
-        activation: Activation function to use. If you don't specify anything,
-            no activation is applied (`a(x) = x`).
-        use_bias: Boolean, whether the layer uses a bias vector.
-        input_quantizer: Quantization function applied to the input of the layer.
-        kernel_quantizer: Quantization function applied to the `kernel` weights matrix.
-        kernel_initializer: Initializer for the `kernel` weights matrix.
-        bias_initializer: Initializer for the bias vector.
-        kernel_regularizer: Regularizer function applied to the `kernel` weights matrix.
-        bias_regularizer: Regularizer function applied to the bias vector.
-        activity_regularizer: Regularizer function applied to
-            the output of the layer (its "activation").
-        kernel_constraint: Constraint function applied to the kernel matrix.
-        bias_constraint: Constraint function applied to the bias vector.
-        implementation: implementation mode, either `1` or `2`.
-            `1` loops over input spatial locations to perform the forward pass.
-            It is memory-efficient but performs a lot of (small) ops.
+#     # Arguments
+#         filters: Integer, the dimensionality of the output space
+#             (i.e. the number of output filters in the convolution).
+#         kernel_size: An integer or tuple/list of a single integer,
+#             specifying the length of the 1D convolution window.
+#         strides: An integer or tuple/list of a single integer, specifying the stride
+#             length of the convolution. Specifying any stride value != 1 is incompatible
+#             with specifying any `dilation_rate` value != 1.
+#         padding: Currently only supports `"valid"` (case-insensitive).
+#             `"same"` may be supported in the future.
+#         data_format: A string, one of `channels_last` (default) or `channels_first`.
+#             The ordering of the dimensions in the inputs. `channels_last` corresponds
+#             to inputs with shape `(batch, length, channels)` while `channels_first`
+#             corresponds to inputs with shape `(batch, channels, length)`. It defaults
+#             to the `image_data_format` value found in your Keras config file at
+#             `~/.keras/keras.json`. If you never set it, then it will be "channels_last".
+#         activation: Activation function to use. If you don't specify anything,
+#             no activation is applied (`a(x) = x`).
+#         use_bias: Boolean, whether the layer uses a bias vector.
+#         input_quantizer: Quantization function applied to the input of the layer.
+#         kernel_quantizer: Quantization function applied to the `kernel` weights matrix.
+#         kernel_initializer: Initializer for the `kernel` weights matrix.
+#         bias_initializer: Initializer for the bias vector.
+#         kernel_regularizer: Regularizer function applied to the `kernel` weights matrix.
+#         bias_regularizer: Regularizer function applied to the bias vector.
+#         activity_regularizer: Regularizer function applied to
+#             the output of the layer (its "activation").
+#         kernel_constraint: Constraint function applied to the kernel matrix.
+#         bias_constraint: Constraint function applied to the bias vector.
+#         implementation: implementation mode, either `1` or `2`.
+#             `1` loops over input spatial locations to perform the forward pass.
+#             It is memory-efficient but performs a lot of (small) ops.
 
-            `2` stores layer weights in a dense but sparsely-populated 2D matrix
-            and implements the forward pass as a single matrix-multiply. It uses
-            a lot of RAM but performs few (large) ops.
+#             `2` stores layer weights in a dense but sparsely-populated 2D matrix
+#             and implements the forward pass as a single matrix-multiply. It uses
+#             a lot of RAM but performs few (large) ops.
 
-            Depending on the inputs, layer parameters, hardware, and
-            `tf.executing_eagerly()` one implementation can be dramatically faster
-            (e.g. 50X) than another.
+#             Depending on the inputs, layer parameters, hardware, and
+#             `tf.executing_eagerly()` one implementation can be dramatically faster
+#             (e.g. 50X) than another.
 
-            It is recommended to benchmark both in the setting of interest to pick
-            the most efficient one (in terms of speed and memory usage).
+#             It is recommended to benchmark both in the setting of interest to pick
+#             the most efficient one (in terms of speed and memory usage).
 
-            Following scenarios could benefit from setting `implementation=2`:
+#             Following scenarios could benefit from setting `implementation=2`:
 
-            - eager execution;
-            - inference;
-            - running on CPU;
-            - large amount of RAM available;
-            - small models (few filters, small kernel);
-            - using `padding=same` (only possible with `implementation=2`).
+#             - eager execution;
+#             - inference;
+#             - running on CPU;
+#             - large amount of RAM available;
+#             - small models (few filters, small kernel);
+#             - using `padding=same` (only possible with `implementation=2`).
 
-    # Input shape
-        3D tensor with shape: `(batch_size, steps, input_dim)`
+#     # Input shape
+#         3D tensor with shape: `(batch_size, steps, input_dim)`
 
-    # Output shape
-        3D tensor with shape: `(batch_size, new_steps, filters)`
-        `steps` value might have changed due to padding or strides.
-    """
+#     # Output shape
+#         3D tensor with shape: `(batch_size, new_steps, filters)`
+#         `steps` value might have changed due to padding or strides.
+#     """
 
-    def __init__(
-        self,
-        filters,
-        kernel_size,
-        strides=1,
-        padding="valid",
-        data_format=None,
-        activation=None,
-        use_bias=True,
-        input_quantizer=None,
-        kernel_quantizer=None,
-        kernel_initializer="glorot_uniform",
-        bias_initializer="zeros",
-        kernel_regularizer=None,
-        bias_regularizer=None,
-        activity_regularizer=None,
-        kernel_constraint=None,
-        bias_constraint=None,
-        implementation=1,
-        **kwargs,
-    ):
-        super().__init__(
-            filters,
-            kernel_size,
-            strides=strides,
-            padding=padding,
-            data_format=data_format,
-            activation=activation,
-            use_bias=use_bias,
-            input_quantizer=input_quantizer,
-            kernel_quantizer=kernel_quantizer,
-            kernel_initializer=kernel_initializer,
-            bias_initializer=bias_initializer,
-            kernel_regularizer=kernel_regularizer,
-            bias_regularizer=bias_regularizer,
-            activity_regularizer=activity_regularizer,
-            kernel_constraint=kernel_constraint,
-            bias_constraint=bias_constraint,
-            implementation=implementation,
-            **kwargs,
-        )
+#     def __init__(
+#         self,
+#         filters,
+#         kernel_size,
+#         strides=1,
+#         padding="valid",
+#         data_format=None,
+#         activation=None,
+#         use_bias=True,
+#         input_quantizer=None,
+#         kernel_quantizer=None,
+#         kernel_initializer="glorot_uniform",
+#         bias_initializer="zeros",
+#         kernel_regularizer=None,
+#         bias_regularizer=None,
+#         activity_regularizer=None,
+#         kernel_constraint=None,
+#         bias_constraint=None,
+#         implementation=1,
+#         **kwargs,
+#     ):
+#         super().__init__(
+#             filters,
+#             kernel_size,
+#             strides=strides,
+#             padding=padding,
+#             data_format=data_format,
+#             activation=activation,
+#             use_bias=use_bias,
+#             input_quantizer=input_quantizer,
+#             kernel_quantizer=kernel_quantizer,
+#             kernel_initializer=kernel_initializer,
+#             bias_initializer=bias_initializer,
+#             kernel_regularizer=kernel_regularizer,
+#             bias_regularizer=bias_regularizer,
+#             activity_regularizer=activity_regularizer,
+#             kernel_constraint=kernel_constraint,
+#             bias_constraint=bias_constraint,
+#             implementation=implementation,
+#             **kwargs,
+#         )
 
 
-@utils.register_keras_custom_object
-class QuantLocallyConnected2D(QuantizerBase, tf.keras.layers.LocallyConnected2D):
-    """Locally-connected quantized layer for 2D inputs.
+# @utils.register_keras_custom_object
+# class QuantLocallyConnected2D(QuantizerBase, tf.keras.layers.LocallyConnected2D):
+#     """Locally-connected quantized layer for 2D inputs.
 
-    The `QuantLocallyConnected2D` layer works similarly to the `QuantConv2D` layer,
-    except that weights are unshared, that is, a different set of filters is applied
-    at each different patch of the input. `input_quantizer` and `kernel_quantizer`
-    are the element-wise quantization functions to use. If both quantization functions
-    are `None` this layer is equivalent to `LocallyConnected2D`.
+#     The `QuantLocallyConnected2D` layer works similarly to the `QuantConv2D` layer,
+#     except that weights are unshared, that is, a different set of filters is applied
+#     at each different patch of the input. `input_quantizer` and `kernel_quantizer`
+#     are the element-wise quantization functions to use. If both quantization functions
+#     are `None` this layer is equivalent to `LocallyConnected2D`.
 
-    !!! example
-        ```python
-        # apply a 3x3 unshared weights convolution with 64 output filters on a
-        32x32 image
-        # with `data_format="channels_last"`:
-        model = Sequential()
-        model.add(QuantLocallyConnected2D(64, (3, 3), input_shape=(32, 32, 3)))
-        # now model.output_shape == (None, 30, 30, 64)
-        # notice that this layer will consume (30*30)*(3*3*3*64) + (30*30)*64
-        parameters
+#     !!! example
+#         ```python
+#         # apply a 3x3 unshared weights convolution with 64 output filters on a
+#         32x32 image
+#         # with `data_format="channels_last"`:
+#         model = Sequential()
+#         model.add(QuantLocallyConnected2D(64, (3, 3), input_shape=(32, 32, 3)))
+#         # now model.output_shape == (None, 30, 30, 64)
+#         # notice that this layer will consume (30*30)*(3*3*3*64) + (30*30)*64
+#         parameters
 
-        # add a 3x3 unshared weights convolution on top, with 32 output filters:
-        model.add(QuantLocallyConnected2D(32, (3, 3)))
-        # now model.output_shape == (None, 28, 28, 32)
-        ```
+#         # add a 3x3 unshared weights convolution on top, with 32 output filters:
+#         model.add(QuantLocallyConnected2D(32, (3, 3)))
+#         # now model.output_shape == (None, 28, 28, 32)
+#         ```
 
-    # Arguments
-        filters: Integer, the dimensionality of the output space
-            (i.e. the number of output filters in the convolution).
-        kernel_size: An integer or tuple/list of 2 integers, specifying the
-            width and height of the 2D convolution window. Can be a single integer to
-            specify the same value for all spatial dimensions.
-        strides: An integer or tuple/list of 2 integers, specifying the strides of the
-            convolution along the width and height. Can be a single integer to specify
-            the same value for all spatial dimensions.
-        padding: Currently only support `"valid"` (case-insensitive).
-            `"same"` will be supported in future.
-        data_format: A string, one of `channels_last` (default) or `channels_first`.
-            The ordering of the dimensions in the inputs. `channels_last` corresponds to
-            inputs with shape `(batch, height, width, channels)` while `channels_first`
-            corresponds to inputs with shape `(batch, channels, height, width)`. It
-            defaults to the `image_data_format` value found in your Keras config file at
-            `~/.keras/keras.json`. If you never set it, then it will be "channels_last".
-        activation: Activation function to use. If you don't specify anything,
-            no activation is applied (`a(x) = x`).
-        use_bias: Boolean, whether the layer uses a bias vector.
-        input_quantizer: Quantization function applied to the input of the layer.
-        kernel_quantizer: Quantization function applied to the `kernel` weights matrix.
-        kernel_initializer: Initializer for the `kernel` weights matrix.
-        bias_initializer: Initializer for the bias vector.
-        kernel_regularizer: Regularizer function applied to the `kernel` weights matrix.
-        bias_regularizer: Regularizer function applied to the bias vector.
-        activity_regularizer: Regularizer function applied to
-            the output of the layer (its "activation").
-        kernel_constraint: Constraint function applied to the kernel matrix.
-        bias_constraint: Constraint function applied to the bias vector.
-        implementation: implementation mode, either `1` or `2`.
-            `1` loops over input spatial locations to perform the forward pass.
-            It is memory-efficient but performs a lot of (small) ops.
+#     # Arguments
+#         filters: Integer, the dimensionality of the output space
+#             (i.e. the number of output filters in the convolution).
+#         kernel_size: An integer or tuple/list of 2 integers, specifying the
+#             width and height of the 2D convolution window. Can be a single integer to
+#             specify the same value for all spatial dimensions.
+#         strides: An integer or tuple/list of 2 integers, specifying the strides of the
+#             convolution along the width and height. Can be a single integer to specify
+#             the same value for all spatial dimensions.
+#         padding: Currently only support `"valid"` (case-insensitive).
+#             `"same"` will be supported in future.
+#         data_format: A string, one of `channels_last` (default) or `channels_first`.
+#             The ordering of the dimensions in the inputs. `channels_last` corresponds to
+#             inputs with shape `(batch, height, width, channels)` while `channels_first`
+#             corresponds to inputs with shape `(batch, channels, height, width)`. It
+#             defaults to the `image_data_format` value found in your Keras config file at
+#             `~/.keras/keras.json`. If you never set it, then it will be "channels_last".
+#         activation: Activation function to use. If you don't specify anything,
+#             no activation is applied (`a(x) = x`).
+#         use_bias: Boolean, whether the layer uses a bias vector.
+#         input_quantizer: Quantization function applied to the input of the layer.
+#         kernel_quantizer: Quantization function applied to the `kernel` weights matrix.
+#         kernel_initializer: Initializer for the `kernel` weights matrix.
+#         bias_initializer: Initializer for the bias vector.
+#         kernel_regularizer: Regularizer function applied to the `kernel` weights matrix.
+#         bias_regularizer: Regularizer function applied to the bias vector.
+#         activity_regularizer: Regularizer function applied to
+#             the output of the layer (its "activation").
+#         kernel_constraint: Constraint function applied to the kernel matrix.
+#         bias_constraint: Constraint function applied to the bias vector.
+#         implementation: implementation mode, either `1` or `2`.
+#             `1` loops over input spatial locations to perform the forward pass.
+#             It is memory-efficient but performs a lot of (small) ops.
 
-            `2` stores layer weights in a dense but sparsely-populated 2D matrix
-            and implements the forward pass as a single matrix-multiply. It uses
-            a lot of RAM but performs few (large) ops.
+#             `2` stores layer weights in a dense but sparsely-populated 2D matrix
+#             and implements the forward pass as a single matrix-multiply. It uses
+#             a lot of RAM but performs few (large) ops.
 
-            Depending on the inputs, layer parameters, hardware, and
-            `tf.executing_eagerly()` one implementation can be dramatically faster
-            (e.g. 50X) than another.
+#             Depending on the inputs, layer parameters, hardware, and
+#             `tf.executing_eagerly()` one implementation can be dramatically faster
+#             (e.g. 50X) than another.
 
-            It is recommended to benchmark both in the setting of interest to pick
-            the most efficient one (in terms of speed and memory usage).
+#             It is recommended to benchmark both in the setting of interest to pick
+#             the most efficient one (in terms of speed and memory usage).
 
-            Following scenarios could benefit from setting `implementation=2`:
+#             Following scenarios could benefit from setting `implementation=2`:
 
-            - eager execution;
-            - inference;
-            - running on CPU;
-            - large amount of RAM available;
-            - small models (few filters, small kernel);
-            - using `padding=same` (only possible with `implementation=2`).
+#             - eager execution;
+#             - inference;
+#             - running on CPU;
+#             - large amount of RAM available;
+#             - small models (few filters, small kernel);
+#             - using `padding=same` (only possible with `implementation=2`).
 
-    # Input shape
-        4D tensor with shape:
-        `(samples, channels, rows, cols)` if data_format='channels_first'
-        or 4D tensor with shape:
-        `(samples, rows, cols, channels)` if data_format='channels_last'.
+#     # Input shape
+#         4D tensor with shape:
+#         `(samples, channels, rows, cols)` if data_format='channels_first'
+#         or 4D tensor with shape:
+#         `(samples, rows, cols, channels)` if data_format='channels_last'.
 
-    # Output shape
-        4D tensor with shape:
-        `(samples, filters, new_rows, new_cols)` if data_format='channels_first'
-        or 4D tensor with shape:
-        `(samples, new_rows, new_cols, filters)` if data_format='channels_last'.
-        `rows` and `cols` values might have changed due to padding.
-    """
+#     # Output shape
+#         4D tensor with shape:
+#         `(samples, filters, new_rows, new_cols)` if data_format='channels_first'
+#         or 4D tensor with shape:
+#         `(samples, new_rows, new_cols, filters)` if data_format='channels_last'.
+#         `rows` and `cols` values might have changed due to padding.
+#     """
 
-    def __init__(
-        self,
-        filters,
-        kernel_size,
-        strides=(1, 1),
-        padding="valid",
-        data_format=None,
-        activation=None,
-        use_bias=True,
-        input_quantizer=None,
-        kernel_quantizer=None,
-        kernel_initializer="glorot_uniform",
-        bias_initializer="zeros",
-        kernel_regularizer=None,
-        bias_regularizer=None,
-        activity_regularizer=None,
-        kernel_constraint=None,
-        bias_constraint=None,
-        implementation=1,
-        **kwargs,
-    ):
-        super().__init__(
-            filters,
-            kernel_size,
-            strides=strides,
-            padding=padding,
-            data_format=data_format,
-            activation=activation,
-            use_bias=use_bias,
-            input_quantizer=input_quantizer,
-            kernel_quantizer=kernel_quantizer,
-            kernel_initializer=kernel_initializer,
-            bias_initializer=bias_initializer,
-            kernel_regularizer=kernel_regularizer,
-            bias_regularizer=bias_regularizer,
-            activity_regularizer=activity_regularizer,
-            kernel_constraint=kernel_constraint,
-            bias_constraint=bias_constraint,
-            implementation=implementation,
-            **kwargs,
-        )
+#     def __init__(
+#         self,
+#         filters,
+#         kernel_size,
+#         strides=(1, 1),
+#         padding="valid",
+#         data_format=None,
+#         activation=None,
+#         use_bias=True,
+#         input_quantizer=None,
+#         kernel_quantizer=None,
+#         kernel_initializer="glorot_uniform",
+#         bias_initializer="zeros",
+#         kernel_regularizer=None,
+#         bias_regularizer=None,
+#         activity_regularizer=None,
+#         kernel_constraint=None,
+#         bias_constraint=None,
+#         implementation=1,
+#         **kwargs,
+#     ):
+#         super().__init__(
+#             filters,
+#             kernel_size,
+#             strides=strides,
+#             padding=padding,
+#             data_format=data_format,
+#             activation=activation,
+#             use_bias=use_bias,
+#             input_quantizer=input_quantizer,
+#             kernel_quantizer=kernel_quantizer,
+#             kernel_initializer=kernel_initializer,
+#             bias_initializer=bias_initializer,
+#             kernel_regularizer=kernel_regularizer,
+#             bias_regularizer=bias_regularizer,
+#             activity_regularizer=activity_regularizer,
+#             kernel_constraint=kernel_constraint,
+#             bias_constraint=bias_constraint,
+#             implementation=implementation,
+#             **kwargs,
+#         )
